@@ -182,7 +182,9 @@ top_transaction["States"] = top_transaction["States"].str.replace("-"," ")
 top_transaction["States"] = top_transaction["States"].str.title()
 top_transaction['States'] = top_transaction['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
 
-top_transaction
+
+#top_users
+
 path6 = "C:/Users/durga prasad/Desktop/project/pulse/data/top/user/country/india/state/"
 top_user_list = os.listdir(path6)
 
@@ -215,7 +217,160 @@ top_user["States"] = top_user["States"].str.replace("andaman-&-nicobar-islands",
 top_user["States"] = top_user["States"].str.replace("-"," ")
 top_user["States"] = top_user["States"].str.title()
 top_user['States'] = top_user['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman")
-top_user
+
+#Table creation
+mydb = mysql.connector.connect(host = "localhost",
+                        user = "root",
+                        password = "Yerram@123",
+                        database = "phonepe_data",
+                        port = "3306"
+                        )
+cursor = mydb.cursor()
+
+#aggregated transaction table
+create_query1 = '''CREATE TABLE if not exists aggregated_transaction (States varchar(50),
+                                                                      Years int,
+                                                                      Quarter int,
+                                                                      Transaction_type varchar(50),
+                                                                      Transaction_count bigint,
+                                                                      Transaction_amount bigint
+                                                                      )'''
+cursor.execute(create_query1)
+mydb.commit()
+
+for index,row in agg_transaction.iterrows():
+    insert_query1 = '''INSERT INTO aggregated_transaction (States, Years, Quarter, Transaction_type, Transaction_count, Transaction_amount)
+                                                        values(%s,%s,%s,%s,%s,%s)'''
+    values = (row["States"],
+              row["Years"],
+              row["Quarter"],
+              row["Transaction_Type"],
+              row["Transaction_Count"],
+              row["Transaction_Amount"]
+              )
+    cursor.execute(insert_query1,values)
+    mydb.commit()
+
+create_query2 = '''CREATE TABLE if not exists aggregated_user (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                Brands varchar(50),
+                                                                Transaction_Count bigint,
+                                                                Percentage float)'''
+cursor.execute(create_query2)
+mydb.commit()
+
+for index,row in agg_user.iterrows():
+    insert_query2 = '''INSERT INTO aggregated_user (States,Years,Quarter,Brands,Transaction_Count,Percentage)
+                                                    values(%s,%s,%s,%s,%s,%s)'''
+    values = (row["States"],
+              row["Years"],
+              row["Quarter"],
+              row["Brand"],
+              row["Transaction_Count"],
+              row["Percentage"])
+    cursor.execute(insert_query2,values)
+    mydb.commit()
+
+#map_transaction_table
+create_query3 = '''CREATE TABLE if not exists map_transaction (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                District varchar(50),
+                                                                Transaction_count bigint,
+                                                                Transaction_amount float)'''
+cursor.execute(create_query3)
+mydb.commit()
+
+for index,row in map_trans.iterrows():
+            insert_query3 = '''
+                INSERT INTO map_Transaction (States, Years, Quarter, District, Transaction_count, Transaction_amount)
+                VALUES (%s, %s, %s, %s, %s, %s)
+
+            '''
+            values = (
+                row['States'],
+                row['Years'],
+                row['Quarter'],
+                row['Districts'],
+                row['Transaction_Count'],
+                row['Transaction_Amount']
+            )
+            cursor.execute(insert_query3,values)
+            mydb.commit() 
+
+
+
+
+
+#map_user_table
+create_query4 = '''CREATE TABLE if not exists map_user (States varchar(50),
+                                                        Years int,
+                                                        Quarter int,
+                                                        Districts varchar(50),
+                                                        RegisteredUser bigint,
+                                                        AppOpens bigint)'''
+cursor.execute(create_query4)
+mydb.commit()
+
+for index,row in map_user.iterrows():
+    insert_query4 = '''INSERT INTO map_user (States, Years, Quarter, Districts, RegisteredUser, AppOpens)
+                        values(%s,%s,%s,%s,%s,%s)'''
+    values = (row["States"],
+              row["Years"],
+              row["Quarter"],
+              row["Districts"],
+              row["RegisteredUser"],
+              row["AppOpens"])
+    cursor.execute(insert_query4,values)
+    mydb.commit()
+
+
+#top_transaction_table
+create_query5 = '''CREATE TABLE if not exists top_transaction (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                pincodes int,
+                                                                Transaction_count bigint,
+                                                                Transaction_amount bigint)'''
+cursor.execute(create_query5)
+mydb.commit()
+
+for index,row in top_transaction.iterrows():
+    insert_query5 = '''INSERT INTO top_transaction (States, Years, Quarter, Pincodes, Transaction_count, Transaction_amount)
+                                                    values(%s,%s,%s,%s,%s,%s)'''
+    values = (row["States"],
+              row["Years"],
+              row["Quarter"],
+              row["Pincodes"],
+              row["Transaction_count"],
+              row["Transaction_amount"])
+    cursor.execute(insert_query5,values)
+    mydb.commit()
+
+#top_user_table
+create_query6 = '''CREATE TABLE if not exists top_user (States varchar(50),
+                                                        Years int,
+                                                        Quarter int,
+                                                        Pincodes int,
+                                                        RegisteredUser bigint
+                                                        )'''
+cursor.execute(create_query6)
+mydb.commit()
+
+for index,row in top_user.iterrows():
+    insert_query6 = '''INSERT INTO top_user (States, Years, Quarter, Pincodes, RegisteredUser)
+                                            values(%s,%s,%s,%s,%s)'''
+    values = (row["States"],
+              row["Years"],
+              row["Quarter"],
+              row["Pincodes"],
+              row["RegisteredUser"])
+    cursor.execute(insert_query6,values)
+    mydb.commit()
+
+
+
 
 
 #mysql connnection
